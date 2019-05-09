@@ -1,6 +1,8 @@
 package com.spg.DemoUpdate.utils;
 
 import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.event.ProgressEvent;
+import com.aliyun.oss.event.ProgressListener;
 import com.aliyun.oss.model.*;
 import com.spg.DemoUpdate.model.OSSFile;
 
@@ -65,9 +67,16 @@ public class OSSClientUtil {
             // 创建上传对象的元数据
             ObjectMetadata metadata = new ObjectMetadata();
             // 上传文件的长度
+
             metadata.setContentLength(is.available());
             //上传文件
-            PutObjectResult putResult = ossClient.putObject(BUCKETNAME, fileName, is);
+            PutObjectRequest request = new PutObjectRequest(BUCKETNAME, fileName, is);
+            PutObjectResult putResult = ossClient.putObject(request.withProgressListener(
+                    new ProgressListener(
+
+                    );
+            ));
+
             //解析结果
             result = putResult.getETag();
             // 关闭OSSClient。

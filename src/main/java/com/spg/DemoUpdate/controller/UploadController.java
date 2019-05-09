@@ -11,10 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,16 +42,15 @@ public class UploadController {
                 // 上传该文件
                 OSSClientUtil.uploadFile(file.getInputStream(), fileName);
 
-            /*//本地服务器中备份上传的文件
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
-            //如果没有files文件夹，则创建
-            if (!Files.isWritable(path)) {
+                /*//本地服务器中备份上传的文件
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
+                //如果没有files文件夹，则创建
+                if (!Files.isWritable(path)) {
                 Files.createDirectories(Paths.get(UPLOAD_FOLDER));
-            }
-            //文件写入指定路径
-            Files.write(path, bytes);*/
-                redirectAttributes.addFlashAttribute("endpoint", OSSClientUtil.ENDPOINT);
+                }
+                //文件写入指定路径
+                Files.write(path, bytes);*/
 
                 // 上传文件的信息
                 String fileInfo = file.getOriginalFilename() + "已成功上传 " + file.getSize() + " KB";
