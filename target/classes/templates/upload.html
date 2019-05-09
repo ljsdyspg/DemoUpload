@@ -9,5 +9,36 @@
     <input type="submit" value="Submit" />
 </form>
 
+<p>----------------------------------------------------</p>
+<h1>处理结果</h1>
+
+<div th:if="${message}">
+<h2 th:text="${message}"/>
+</div>
+
+<h2>已上传文件</h2>
+<div th:if="${filesInfo}">
+    <p th:utext="${filesInfo}"/>
+</div>
+
+<table border="1">
+    <tr>
+        <th>序号</th>
+        <th>文件名</th>
+        <th>文件大小</th>
+        <th>上次修改时间</th>
+        <th>超链接</th>
+    </tr>
+    <tr th:each="OSSFile,stat:${fileList}">
+        <td th:text="${stat.index}"></td>
+        <td th:text="${OSSFile.name}"></td>
+        <td th:text="${OSSFile.size}" th:align="right"></td>
+        <td th:text="${OSSFile.lastModified}"  style="padding-left: 20px;padding-right: 20px;"></td>
+        <td><a th:href="${OSSFile.url}" th:text="下载" target="view_window"></a></td>
+    </tr>
+</table>
+
+
+
 </body>
 </html>

@@ -2,12 +2,14 @@ package com.spg.DemoUpdate.utils;
 
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.*;
+import com.spg.DemoUpdate.model.OSSFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author SPG
@@ -17,7 +19,7 @@ import java.util.UUID;
 public class OSSClientUtil {
 
 
-    public static String ENDPOINT = "http://oss-cn-hangzhou.aliyuncs.com";
+    public static String ENDPOINT = "oss-cn-hangzhou.aliyuncs.com";
     // LTAIsiYRN51xsn0b
     public static String ACCESSKEYID = "LTAIsiYRN51xsn0b";
     // Sz6jBb39XIHJHniCHsJ6wvWDnW1HAP
@@ -25,10 +27,15 @@ public class OSSClientUtil {
     // spg-test
     public static String BUCKETNAME = "spg-test";
 
+    // 格式化最后一次修改时间
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+
     // 获取ossClient
     public static OSSClient ossClientInit() {
         return new OSSClient(ENDPOINT, ACCESSKEYID, ACCESSKEYSECRET);
     }
+
+
 
     // 是否存在该Bucket
     public static boolean hasBucket(OSSClient ossClient) {
@@ -86,8 +93,9 @@ public class OSSClientUtil {
 
     /**
      *  列举所有的文件
+     * @return
      */
-    public static String showFiles(){
+    public static List<OSSFile> showFiles(){
 
         // 文件名前缀，这里列举所有的文件
         String KeyPrefix = "";
@@ -95,18 +103,36 @@ public class OSSClientUtil {
         OSSClient ossClient = new OSSClient(ENDPOINT, ACCESSKEYID, ACCESSKEYSECRET);
         // 列举文件
         ObjectListing objectListing = ossClient.listObjects(BUCKETNAME, KeyPrefix);
-        List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("<br/>");
-        sb.append("当前文件总数: ").append(sums.size()).append(" KB").append("<br/><br/>:");
-        // 所有文件名
-        for (OSSObjectSummary s : sums) {
-            sb.append(s.getKey()).append(" ").append(s.getSize()).append("<br/>");
+        List<OSSFile> ossFiles = new ArrayList<>();
+        for (OSSObjectSummary o: objectListing.getObjectSummaries()) {
+            ossFiles.add(new OSSFile(o.getKey(),
+                    calculateSize(o.getSize()),
+                    addURL(o),
+                    simpleDateFormat.format(o.getLastModified())));
         }
-        // 关闭OSSClient
-        ossClient.shutdown();
+        return ossFiles;
+    }
+
+    // 计算文件大小
+    public static String calculateSize(long size){
+        StringBuilder sb = new StringBuilder();
+        if (size < 1024){
+            sb.append(size).append(" B");
+        } else if (size < 1048576){
+            sb.append(String.format("%.3f",size / 1024.0)).append(" KB");
+        } else {
+            sb.append(String.format("%.3f",size / 1048576.0)).append(" MB");
+        }
         return sb.toString();
     }
 
+    // 给出文件下载URL
+    public static String addURL(OSSObjectSummary o){
+        return "http://"+o.getBucketName()+"."+ENDPOINT +"/"+o.getKey();
+    }
+
+    public static void main(String[] args) {
+
+    }
 }
